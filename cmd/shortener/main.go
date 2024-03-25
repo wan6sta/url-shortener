@@ -12,7 +12,7 @@ import (
 
 func main() {
 	mux := http.NewServeMux()
-	cfg := config.MustLoad()
+	cfg := config.MustLoadByPath("./config/local.yaml")
 	log := setupLogger(cfg.Env)
 	st, err := postgres.NewStorage()
 	if err != nil {
