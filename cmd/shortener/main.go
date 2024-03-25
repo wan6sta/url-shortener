@@ -10,7 +10,6 @@ import (
 )
 
 func main() {
-	mux := http.NewServeMux()
 	cfg := config.MustLoadByPath("./config/local.yaml")
 	log := setupLogger(cfg.Env)
 	st, err := postgres.NewStorage()
@@ -18,9 +17,9 @@ func main() {
 		log.Error("failed to initialize db")
 	}
 
-	mux.HandleFunc("/", url.CreateUrlHandler(log, st))
+	http.HandleFunc("/", url.CreateUrlHandler(log, st))
 
-	err = http.ListenAndServe(":8080", mux)
+	err = http.ListenAndServe(":8080", nil)
 	if err != nil {
 		log.Error("failed to start server")
 	}
