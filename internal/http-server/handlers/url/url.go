@@ -12,7 +12,7 @@ type Creater interface {
 	GetUrl(url string) (string, error)
 }
 
-func CreateUrl(log *slog.Logger, creater Creater) http.HandlerFunc {
+func CreateUrlHandler(log *slog.Logger, creater Creater) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodPost {
 			const op = "handlers.CreateUrl"

@@ -19,7 +19,7 @@ func main() {
 		log.Error("failed to initialize db")
 	}
 
-	mux.HandleFunc("/", url.CreateUrl(log, st))
+	mux.HandleFunc("/", url.CreateUrlHandler(log, st))
 
 	err = http.ListenAndServe(httpAddress(cfg), mux)
 	if err != nil {
