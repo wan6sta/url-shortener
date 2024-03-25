@@ -1,18 +1,14 @@
 package url
 
 import (
+	"github.com/wan6sta/url-shortener/internal/storage/postgres"
 	"io"
 	"log/slog"
 	"net/http"
 	"strings"
 )
 
-type Creater interface {
-	CreateUrl(url string) (string, error)
-	GetUrl(url string) (string, error)
-}
-
-func CreateUrlHandler(log *slog.Logger, creater Creater) http.HandlerFunc {
+func CreateUrlHandler(log *slog.Logger, st postgres.Storage) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodPost {
 			const op = "handlers.CreateUrl"
@@ -23,7 +19,7 @@ func CreateUrlHandler(log *slog.Logger, creater Creater) http.HandlerFunc {
 				return
 			}
 
-			url, err := creater.CreateUrl(string(res))
+			url, err := st.CreateUrl(string(res))
 			if err != nil {
 				log.Error("key does not exists", op, err.Error())
 				return
@@ -49,7 +45,7 @@ func CreateUrlHandler(log *slog.Logger, creater Creater) http.HandlerFunc {
 				return
 			}
 
-			url, err := creater.GetUrl(id)
+			url, err := st.GetUrl(id)
 			if err != nil {
 				log.Error("cannot write response", op, err.Error())
 				return
