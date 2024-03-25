@@ -8,15 +8,9 @@ import (
 	"strings"
 )
 
-type Handlers struct{}
-
-func NewHandlers() *Handlers {
-	return &Handlers{}
-}
-
 const localhost = "http://localhost:8080/"
 
-func (u *Handlers) Url(log *slog.Logger, st *postgres.Storage) http.HandlerFunc {
+func HandleUrl(log *slog.Logger, s *postgres.Storage) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodPost {
 			const op = "handlers.CreateUrl"
@@ -27,7 +21,7 @@ func (u *Handlers) Url(log *slog.Logger, st *postgres.Storage) http.HandlerFunc 
 				return
 			}
 
-			url, err := st.CreateUrl(string(res))
+			url, err := postgres.CreateUrl(string(res), s)
 			if err != nil {
 				log.Error("key does not exists", op, err.Error())
 				return
@@ -53,7 +47,7 @@ func (u *Handlers) Url(log *slog.Logger, st *postgres.Storage) http.HandlerFunc 
 				return
 			}
 
-			url, err := st.GetUrl(id)
+			url, err := postgres.GetUrl(id, s)
 			if err != nil {
 				log.Error("cannot write response", op, err.Error())
 				return
@@ -66,6 +60,5 @@ func (u *Handlers) Url(log *slog.Logger, st *postgres.Storage) http.HandlerFunc 
 		}
 
 		http.Error(w, "method not allowed", http.StatusBadRequest)
-		return
 	}
 }

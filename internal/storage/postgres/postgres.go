@@ -15,14 +15,14 @@ func NewStorage() (*Storage, error) {
 	}, nil
 }
 
-func (s *Storage) CreateUrl(url string) (string, error) {
+func CreateUrl(url string, s *Storage) (string, error) {
 	id := gofakeit.UUID()
 	s.urlMap[id] = url
 
 	return id, nil
 }
 
-func (s *Storage) GetUrl(url string) (string, error) {
+func GetUrl(url string, s *Storage) (string, error) {
 	fUrl, ok := s.urlMap[url]
 	if !ok {
 		return "", errors.New("key does not exists")
