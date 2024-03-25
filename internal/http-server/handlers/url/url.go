@@ -8,7 +8,13 @@ import (
 	"strings"
 )
 
-func CreateUrlHandler(log *slog.Logger, st *postgres.Storage) http.HandlerFunc {
+type Url struct{}
+
+func NewUrl() *Url {
+	return &Url{}
+}
+
+func (u *Url) CreateUrlHandler(log *slog.Logger, st *postgres.Storage) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodPost {
 			const op = "handlers.CreateUrl"
