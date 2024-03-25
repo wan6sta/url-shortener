@@ -15,10 +15,6 @@ func NewStorage() (*Storage, error) {
 	}, nil
 }
 
-type RandomString struct {
-	str string
-}
-
 func (s *Storage) CreateUrl(url string) (string, error) {
 	id := gofakeit.UUID()
 	s.urlMap[id] = url
