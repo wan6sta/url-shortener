@@ -8,13 +8,15 @@ import (
 	"strings"
 )
 
-type Url struct{}
+type Handlers struct{}
 
-func NewUrl() *Url {
-	return &Url{}
+func NewHandlers() *Handlers {
+	return &Handlers{}
 }
 
-func (u *Url) CreateUrlHandler(log *slog.Logger, st *postgres.Storage) http.HandlerFunc {
+const localhost = "http://localhost:8080/"
+
+func (u *Handlers) Url(log *slog.Logger, st *postgres.Storage) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodPost {
 			const op = "handlers.CreateUrl"
@@ -31,13 +33,13 @@ func (u *Url) CreateUrlHandler(log *slog.Logger, st *postgres.Storage) http.Hand
 				return
 			}
 
-			w.WriteHeader(http.StatusCreated)
-
-			_, err = w.Write([]byte(url))
+			_, err = w.Write([]byte(localhost + url))
 			if err != nil {
 				log.Error("cannot write response", op, err.Error())
 				return
 			}
+
+			w.WriteHeader(http.StatusCreated)
 
 			return
 		}
@@ -60,15 +62,10 @@ func (u *Url) CreateUrlHandler(log *slog.Logger, st *postgres.Storage) http.Hand
 			w.Header().Set("Location", url)
 			w.WriteHeader(http.StatusTemporaryRedirect)
 
-			/*_, err = w.Write([]byte(url))
-			if err != nil {
-				log.Error("cannot write response", op, err.Error())
-				return
-			}*/
-
 			return
 		}
 
 		http.Error(w, "method not allowed", http.StatusBadRequest)
+		return
 	}
 }
