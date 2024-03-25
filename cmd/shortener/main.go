@@ -21,7 +21,7 @@ func main() {
 
 	mux.HandleFunc("/", url.CreateUrlHandler(log, st))
 
-	err = http.ListenAndServe(httpAddress(cfg), mux)
+	err = http.ListenAndServe(":8080", mux)
 	if err != nil {
 		log.Error("failed to start server")
 	}
