@@ -5,7 +5,6 @@ import (
 	"github.com/wan6sta/url-shortener/internal/http-server/handlers/url"
 	"github.com/wan6sta/url-shortener/internal/storage/postgres"
 	"log/slog"
-	"net"
 	"net/http"
 	"os"
 )
@@ -29,9 +28,9 @@ func main() {
 	log.Error("server stopped")
 }
 
-func httpAddress(cfg *config.Config) string {
+/*func httpAddress(cfg *config.Config) string {
 	return net.JoinHostPort(cfg.Host, cfg.Port)
-}
+}*/
 
 const (
 	envLocal = "local"
