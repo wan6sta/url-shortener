@@ -1,6 +1,6 @@
 module github.com/wan6sta/url-shortener
 
-go 1.22.1
+go 1.21
 
 require (
 	github.com/BurntSushi/toml v1.2.1 // indirect
