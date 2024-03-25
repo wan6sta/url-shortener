@@ -33,13 +33,13 @@ func (u *Handlers) Url(log *slog.Logger, st *postgres.Storage) http.HandlerFunc 
 				return
 			}
 
+			w.WriteHeader(http.StatusCreated)
+
 			_, err = w.Write([]byte(localhost + url))
 			if err != nil {
 				log.Error("cannot write response", op, err.Error())
 				return
 			}
-
-			w.WriteHeader(http.StatusCreated)
 
 			return
 		}
