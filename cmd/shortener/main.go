@@ -16,8 +16,9 @@ func main() {
 	if err != nil {
 		log.Error("failed to initialize db")
 	}
+	u := url.NewUrl(st)
 
-	http.HandleFunc("/", url.HandleUrl(log, st))
+	http.HandleFunc("/", u.UrlHandler)
 
 	err = http.ListenAndServe(":8080", nil)
 	if err != nil {

@@ -10,55 +10,68 @@ import (
 
 const localhost = "http://localhost:8080/"
 
-func HandleUrl(log *slog.Logger, s *postgres.Storage) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == http.MethodPost {
-			const op = "handlers.CreateUrl"
+type Url struct {
+	s *postgres.Storage
+}
 
-			res, err := io.ReadAll(r.Body)
-			if err != nil {
-				log.Error("cannot parse body", op, err.Error())
-				return
-			}
+func NewUrl(s *postgres.Storage) *Url {
+	return &Url{s: s}
+}
 
-			url, err := postgres.CreateUrl(string(res), s)
-			if err != nil {
-				log.Error("key does not exists", op, err.Error())
-				return
-			}
+func (u *Url) UrlHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/plain")
+	w.Header().Set("charset", "utf8")
 
-			w.WriteHeader(http.StatusCreated)
+	if r.Method == http.MethodPost {
+		const op = "handlers.CreateUrl"
 
-			_, err = w.Write([]byte(localhost + url))
-			if err != nil {
-				log.Error("cannot write response", op, err.Error())
-				return
-			}
+		res, err := io.ReadAll(r.Body)
+		if err != nil {
+			slog.Error("cannot parse body", op, err.Error())
+			http.Error(w, "cannot parse body", http.StatusBadRequest)
 
 			return
 		}
 
-		if r.Method == http.MethodGet {
-			const op = "handlers.GetUrl"
-
-			id := strings.TrimPrefix(r.URL.Path, "/")
-			if id == "" {
-				http.Error(w, "ID not provided", http.StatusBadRequest)
-				return
-			}
-
-			url, err := postgres.GetUrl(id, s)
-			if err != nil {
-				log.Error("cannot write response", op, err.Error())
-				return
-			}
-
-			w.Header().Set("Location", url)
-			w.WriteHeader(http.StatusTemporaryRedirect)
+		url, err := u.s.CreateUrl(string(res))
+		if err != nil {
+			slog.Error("key does not exists", op, err.Error())
+			http.Error(w, "key does not exists", http.StatusBadRequest)
 
 			return
 		}
 
-		http.Error(w, "method not allowed", http.StatusBadRequest)
+		w.WriteHeader(http.StatusCreated)
+
+		_, err = w.Write([]byte(localhost + url))
+		if err != nil {
+			slog.Error("cannot write response", op, err.Error())
+			http.Error(w, "cannot write response", http.StatusBadRequest)
+
+			return
+		}
+		return
+	}
+
+	if r.Method == http.MethodGet {
+		const op = "handlers.GetUrl"
+
+		id := strings.TrimPrefix(r.URL.Path, "/")
+		if id == "" {
+			http.Error(w, "ID not provided", http.StatusBadRequest)
+			return
+		}
+
+		url, err := u.s.GetUrl(id)
+		if err != nil {
+			slog.Error("cannot write response", op, err.Error())
+			http.Error(w, "key does not exists", http.StatusBadRequest)
+			return
+		}
+
+		w.Header().Set("Location", url)
+		w.WriteHeader(http.StatusTemporaryRedirect)
+
+		return
 	}
 }
