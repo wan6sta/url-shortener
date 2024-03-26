@@ -1,7 +1,6 @@
 package url
 
 import (
-	"github.com/wan6sta/url-shortener/internal/storage/postgres"
 	"io"
 	"log/slog"
 	"net/http"
@@ -10,12 +9,17 @@ import (
 
 const localhost = "http://localhost:8080/"
 
-type Url struct {
-	s *postgres.Storage
+type Repositories interface {
+	CreateUrl(url string) (string, error)
+	GetUrl(url string) (string, error)
 }
 
-func NewUrl(s *postgres.Storage) *Url {
-	return &Url{s: s}
+type Url struct {
+	r Repositories
+}
+
+func NewUrl(r Repositories) *Url {
+	return &Url{r: r}
 }
 
 func (u *Url) UrlHandler(w http.ResponseWriter, r *http.Request) {
@@ -33,7 +37,7 @@ func (u *Url) UrlHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		url, err := u.s.CreateUrl(string(res))
+		url, err := u.r.CreateUrl(string(res))
 		if err != nil {
 			slog.Error("key does not exists", op, err.Error())
 			http.Error(w, "key does not exists", http.StatusBadRequest)
@@ -62,7 +66,7 @@ func (u *Url) UrlHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		url, err := u.s.GetUrl(id)
+		url, err := u.r.GetUrl(id)
 		if err != nil {
 			slog.Error("cannot write response", op, err.Error())
 			http.Error(w, "key does not exists", http.StatusBadRequest)
